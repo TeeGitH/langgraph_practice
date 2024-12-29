@@ -1,0 +1,6 @@
+langchain
+langgraph
+graphviz
+IPython
+langchain-openai
+python-dotenv 
