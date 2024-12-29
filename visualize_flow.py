@@ -64,31 +64,38 @@ from IPython.display import Image, display
 
 try:
     import graphviz
-    dot = graphviz.Digraph(comment='Agent Workflow')
+    # Create a new directed graph
+    dot = graphviz.Digraph('Agent Workflow', format='png')
     
-    # Configure the graph
-    dot.attr(rankdir='TB')  # Top to Bottom direction
+    # Graph attributes
+    dot.attr(rankdir='TB', splines='ortho')
     
-    # Add nodes with custom styling
-    dot.attr('node', shape='box', style='rounded')
-    dot.node('START', 'START', shape='oval')
-    dot.node('chief', 'Chief')
-    dot.node('assistant1', 'Assistant 1\n(Personnel, Logistics, PR)')
-    dot.node('assistant2', 'Assistant 2\n(Intelligence, Operations)')
-    dot.node('summarizer', 'Summarizer')
-    dot.node('END', 'END', shape='oval')
+    # Node styling
+    dot.attr('node', 
+            style='filled',
+            shape='box',
+            fontname='Arial',
+            fontsize='12',
+            margin='0.2')
     
-    # Add edges with custom styling
-    dot.attr('edge', color='blue')
+    # Add nodes with different colors
+    dot.node('START', 'START', shape='oval', fillcolor='lightgrey')
+    dot.node('chief', 'Chief\nManager', fillcolor='lightblue')
+    dot.node('assistant1', 'Assistant 1\nPersonnel, Logistics, PR', fillcolor='lightgreen')
+    dot.node('assistant2', 'Assistant 2\nIntelligence, Operations', fillcolor='lightgreen')
+    dot.node('summarizer', 'Summarizer', fillcolor='lightyellow')
+    dot.node('END', 'END', shape='oval', fillcolor='lightgrey')
+    
+    # Add edges with labels
     dot.edge('START', 'chief')
-    dot.edge('chief', 'assistant1')
-    dot.edge('chief', 'assistant2')
-    dot.edge('assistant1', 'summarizer')
-    dot.edge('assistant2', 'summarizer')
-    dot.edge('summarizer', 'END')
+    dot.edge('chief', 'assistant1', 'delegate')
+    dot.edge('chief', 'assistant2', 'delegate')
+    dot.edge('assistant1', 'summarizer', 'report')
+    dot.edge('assistant2', 'summarizer', 'report')
+    dot.edge('summarizer', 'END', 'final plan')
     
-    # Save with specific engine
-    dot.render('agent_flow', view=True, engine='dot')
+    # Save the graph
+    dot.render('agent_flow', view=True, cleanup=True)
+    print("Visualization saved as 'agent_flow.pdf' and 'agent_flow.png'")
 except Exception as e:
-    print(f"Visualization error: {e}")
-    print("Please ensure Graphviz is installed and in your system PATH") 
+    print(f"Visualization error: {e}") 
