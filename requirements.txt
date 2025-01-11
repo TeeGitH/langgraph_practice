@@ -3,4 +3,5 @@ langgraph
 graphviz
 IPython
 langchain-openai
-python-dotenv 
+python-dotenv
+flask 

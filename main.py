@@ -36,71 +36,76 @@ def get_user_choice():
 
 def run_workflow(task):
     """Run the agent workflow with the selected task"""
-    # Create the graph
-    graph = StateGraph(AgentState)
+    try:
+        # Create a fresh graph for each run
+        graph = StateGraph(AgentState)
 
-    # Add nodes
-    graph.add_node("chief", chief_node)
-    graph.add_node("assistant1", assistant1_node)
-    graph.add_node("assistant2", assistant2_node)
-    graph.add_node("summarizer", summarizer_node)
+        # Add nodes
+        graph.add_node("chief", chief_node)
+        graph.add_node("assistant1", assistant1_node)
+        graph.add_node("assistant2", assistant2_node)
+        graph.add_node("summarizer", summarizer_node)
 
-    # Set entry point
-    graph.set_entry_point("chief")
+        # Set entry point
+        graph.set_entry_point("chief")
 
-    # Add edges
-    graph.add_edge("chief", "assistant1")
-    graph.add_edge("chief", "assistant2")
+        # Add edges
+        graph.add_edge("chief", "assistant1")
+        graph.add_edge("chief", "assistant2")
 
-    # Add conditional edges
-    def should_continue(state):
-        if "assistant1_plan" in state and "assistant2_plan" in state:
-            return "summarizer"
-        return None
+        # Add conditional edges
+        def should_continue(state):
+            if "assistant1_plan" in state and "assistant2_plan" in state:
+                return "summarizer"
+            return None
 
-    graph.add_conditional_edges(
-        "assistant1",
-        should_continue,
-        {
-            "summarizer": "summarizer",
-            None: "assistant1"
+        graph.add_conditional_edges(
+            "assistant1",
+            should_continue,
+            {
+                "summarizer": "summarizer",
+                None: "assistant1"
+            }
+        )
+
+        graph.add_conditional_edges(
+            "assistant2",
+            should_continue,
+            {
+                "summarizer": "summarizer",
+                None: "assistant2"
+            }
+        )
+
+        graph.add_edge("summarizer", END)
+
+        # Compile the graph
+        workflow = graph.compile()
+
+        # Initialize a fresh state for each run
+        initial_state = {
+            "task": task,
+            "chief_messages": [],
+            "assistant1_messages": [],
+            "assistant2_messages": [],
+            "summarizer_messages": [],
+            "assistant1_plan": {},
+            "assistant2_plan": {},
+            "final_summary": ""
         }
-    )
 
-    graph.add_conditional_edges(
-        "assistant2",
-        should_continue,
-        {
-            "summarizer": "summarizer",
-            None: "assistant2"
-        }
-    )
+        # Run the workflow with fresh state
+        result = workflow.invoke(initial_state)
+        
+        # Validate result
+        if not result or 'final_summary' not in result:
+            raise ValueError("Workflow did not produce a valid result")
+            
+        return result
 
-    graph.add_edge("summarizer", END)
-
-    # Compile the graph
-    workflow = graph.compile()
-
-    # Initialize state with the selected task
-    initial_state = {
-        "task": task,
-        "chief_messages": [],
-        "assistant1_messages": [],
-        "assistant2_messages": [],
-        "summarizer_messages": [],
-        "assistant1_plan": {},
-        "assistant2_plan": {},
-        "final_summary": ""
-    }
-
-    # Run the workflow
-    result = workflow.invoke(initial_state)
-
-    # Print the final summary
-    print("\nFinal Summary:")
-    print("-" * 80)  # Increased width for consistency
-    print(result["final_summary"])
-    print("-" * 80)
+    except Exception as e:
+        print(f"Error in workflow execution: {str(e)}")
+        raise  # Re-raise the exception for proper handling in app.py
 
 def main():
     """Main program loop"""
@@ -117,8 +122,11 @@ def main():
             
         print(f"\nExecuting Task {choice}: {TASKS[choice]}")
         print("=" * 80)  # Increased width for consistency
-        run_workflow(TASKS[choice])
-        print("\nTask execution completed.")
+        result = run_workflow(TASKS[choice])
+        print("\nFinal Summary:")
+        print("-" * 80)  # Increased width for consistency
+        print(result["final_summary"])
+        print("-" * 80)
         input("\nPress Enter to continue...")
 
 if __name__ == "__main__":

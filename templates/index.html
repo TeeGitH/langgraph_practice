@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Workflow System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .result-section {
+            display: none;
+            margin-top: 20px;
+        }
+        /* Add styles for the execution results */
+        .execution-results {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        /* Style for the pre tag to handle text wrapping */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">AI Agent Workflow System</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Left Column - System Info -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">System Architecture</h5>
+                        <img src="{{ url_for('static', filename='agent_flow.png') }}" class="img-fluid mb-3" alt="Workflow">
+                        <h6>Agents:</h6>
+                        <ul>
+                            <li>Chief Agent (Coordinator)</li>
+                            <li>Assistant 1 (Personnel, Logistics, PR)</li>
+                            <li>Assistant 2 (Intelligence, Operations)</li>
+                            <li>Summarizer (Final Plan)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Task Selection -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Select a Task</h5>
+                        <form id="taskForm" class="d-flex align-items-center justify-content-between">
+                            <select class="form-select me-2" id="taskSelect" required style="width: 85%;">
+                                <option value="">Choose a task...</option>
+                                {% for key, task in tasks.items() %}
+                                <option value="{{ key }}">Task {{ key }}: {{ task }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="width: 10%;">Go</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="result-section card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Execution Results</h5>
+                        <div class="spinner-border text-primary d-none" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="execution-results">
+                            <div id="result-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#taskForm').on('submit', function(e) {
+                e.preventDefault();
+                const taskKey = $('#taskSelect').val();
+                if (!taskKey) {
+                    alert('Please select a task');
+                    return;
+                }
+
+                const spinner = $('.spinner-border');
+                const resultSection = $('.result-section');
+                const resultContent = $('#result-content');
+
+                // Clear previous results
+                resultContent.empty();
+                
+                // Show loading state
+                spinner.removeClass('d-none');
+                resultSection.show();
+                resultContent.html('Processing task...');
+
+                // Execute task
+                $.ajax({
+                    url: '/execute_task',
+                    method: 'POST',
+                    data: { task_key: taskKey },
+                    success: function(response) {
+                        if (response.success) {
+                            resultContent.html(`<pre>${response.summary}</pre>`);
+                        } else {
+                            resultContent.html(`<div class="alert alert-danger">${response.error}</div>`);
+                        }
+                    },
+                    error: function() {
+                        resultContent.html('<div class="alert alert-danger">An error occurred</div>');
+                    },
+                    complete: function() {
+                        spinner.addClass('d-none');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
