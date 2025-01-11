@@ -1,0 +1,70 @@
+=== LangGraph Agent System Development Log ===
+
+Project Overview:
+- A hierarchical multi-agent system using LangGraph
+- Consists of: Chief, Assistant1, Assistant2, and Summarizer agents
+- Visualization available in agent_flow.png
+
+System Architecture:
+1. Chief Agent (Top Level)
+   - Receives tasks and delegates to assistants
+   - Coordinates overall execution
+
+2. Assistant Agents (Middle Level)
+   - Assistant 1: Handles Personnel, Logistics, and PR
+   - Assistant 2: Handles Intelligence and Operation Planning
+   - Work in parallel after receiving tasks from Chief
+
+3. Summarizer Agent (Final Level)
+   - Integrates plans from both assistants
+   - Creates comprehensive execution summary
+
+Available Tasks:
+A. Organize a major corporate event for 500 people
+B. Develop and execute a company-wide digital transformation strategy
+C. Plan and implement a global market expansion into three new countries
+D. Design and launch a comprehensive employee wellness and development program
+E. Create a crisis management and business continuity plan for multiple scenarios
+
+Key Files:
+1. main.py - Main program with task selection and workflow execution
+2. nodes.py - Agent definitions and behaviors
+3. agent_state.py - State management for the agent system
+4. graph_setup.py - Graph configuration for agent interactions
+5. agent_flow.png - Visual representation of agent workflow
+6. .env - Configuration for OpenAI API key
+7. .env.example - Template for environment setup
+8. ai_memory.txt - Development log and system documentation
+
+Development Progress:
+1. Initial setup with basic agent structure
+2. Added visualization using Graphviz
+3. Implemented parallel processing for assistants
+4. Added task selection menu with 5 predefined tasks
+5. Improved error handling and user interface
+6. Added documentation and setup instructions
+
+Technical Details:
+- Using OpenAI's GPT-3.5-turbo model
+- LangGraph for agent workflow management
+- Graphviz for workflow visualization
+- Python-dotenv for environment management
+
+Future Considerations:
+1. Potential for adding more specialized agents
+2. Enhanced error handling and recovery
+3. Persistent storage for task results
+4. More interactive user interface
+5. Additional task types and configurations
+
+Dependencies:
+- langchain
+- langgraph
+- graphviz
+- IPython
+- langchain-openai
+- python-dotenv
+
+Change Log:
+- Initial creation of ai_memory.txt
+- Added Change Log section 

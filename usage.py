@@ -1,3 +1,5 @@
+from graph_setup import workflow, graph
+
 # Initialize the state
 initial_state = {
     "task": "Organize a major corporate event for 500 people",

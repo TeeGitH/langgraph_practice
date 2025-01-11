@@ -1,4 +1,6 @@
 from langgraph.graph import StateGraph, END
+from agent_state import AgentState
+from nodes import chief_node, assistant1_node, assistant2_node, summarizer_node
 
 # Initialize the graph
 graph = StateGraph(AgentState)
@@ -18,27 +20,27 @@ graph.add_edge("chief", "assistant1")
 graph.add_edge("chief", "assistant2")
 
 # 3. After both assistants complete, go to summarizer
-# We need to ensure both assistants are done before moving to summarizer
 def should_continue(state):
     if "assistant1_plan" in state and "assistant2_plan" in state:
         return "summarizer"
     return None
 
-graph.add_conditional_edge(
+# Changed from add_conditional_edge to add_conditional_edges
+graph.add_conditional_edges(
     "assistant1",
     should_continue,
     {
         "summarizer": "summarizer",
-        None: "assistant1"  # Wait if not ready
+        None: "assistant1"
     }
 )
 
-graph.add_conditional_edge(
+graph.add_conditional_edges(
     "assistant2",
     should_continue,
     {
         "summarizer": "summarizer",
-        None: "assistant2"  # Wait if not ready
+        None: "assistant2"
     }
 )
 

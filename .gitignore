@@ -1,5 +1,7 @@
 # Environment variables
 .env
+# But allow the example file
+!.env.example
 
 # Python
 __pycache__/
@@ -34,7 +36,4 @@ env/
 .vscode/
 *.swp
 *.swo
-.DS_Store
-
-# Generated files
-agent_flow.png 
+.DS_Store 
