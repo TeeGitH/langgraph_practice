@@ -1,5 +1,40 @@
 === LangGraph Agent System Development Log ===
 
+Latest Updates:
+
+UI Enhancement Update (2025-01-11, 21:25 GMT+7 BKK):
+- Improved task selection and button layout:
+  * Restored task selection box to standard height for better usability
+  * Relocated AI and Go buttons below the task selection box
+  * Added proper spacing between buttons using Bootstrap gap utility
+  * Styled AI button with distinctive purple color (#6f42c1)
+  * Improved thinking indicator placement in task selection box
+  * Enhanced user feedback during task generation and execution
+  * Implemented automatic reset to original task list after execution
+  * Optimized button widths and alignment for better visual balance
+
+Feature Update (2025-01-11, 20:44 GMT+7):
+- Added AI Task Creation functionality
+  * New "AI" button added to generate dynamic tasks
+  * Integration with OpenAI API for task generation
+  * UI updates to handle dynamic task creation and execution
+  * Modified task execution flow to handle AI-generated tasks
+  * Enhanced error handling for dynamic task processing
+  * Updated form layout to accommodate new AI task feature
+  * Improved user feedback during task generation process
+
+UI Improvements (2025-01-11, 20:44 GMT+7):
+- Enhanced task selection interface with a dropdown menu and "Go" button
+- Implemented vertical scrolling for execution results with overflow-y: auto
+- Added proper text wrapping for long results using white-space: pre-wrap
+- Improved layout with Bootstrap flex utilities for better alignment
+- Positioned "Go" button on the right side of the task selection box
+- Set specific widths for select box (85%) and Go button (10%)
+- Added proper spacing between elements using Bootstrap margin utilities
+- Enhanced visual feedback during task execution with loading spinner
+- Implemented error handling and success messages in the UI
+- Ensured responsive design across different screen sizes
+
 Project Overview:
 - A hierarchical multi-agent system using LangGraph
 - Consists of: Chief, Assistant1, Assistant2, and Summarizer agents
@@ -45,10 +80,13 @@ Development Progress:
 6. Added documentation and setup instructions
 
 Technical Details:
-- Using OpenAI's GPT-3.5-turbo model
-- LangGraph for agent workflow management
+- LLM: OpenAI's GPT-3.5-turbo model (via langchain-openai)
+  * Used for task generation in AI mode
+  * Used for agent communication and reasoning
+  * Accessed through OpenAI's v1.0.0+ API client
+- LangGraph for agent workflow management and orchestration
 - Graphviz for workflow visualization
-- Python-dotenv for environment management
+- Python-dotenv for environment management and API key security
 
 Future Considerations:
 1. Potential for adding more specialized agents
@@ -68,15 +106,3 @@ Dependencies:
 Change Log:
 - Initial creation of ai_memory.txt
 - Added Change Log section 
-
-UI Improvements (2025-01-11, 20:44 GMT+7):
-- Enhanced task selection interface with a dropdown menu and "Go" button
-- Implemented vertical scrolling for execution results with overflow-y: auto
-- Added proper text wrapping for long results using white-space: pre-wrap
-- Improved layout with Bootstrap flex utilities for better alignment
-- Positioned "Go" button on the right side of the task selection box
-- Set specific widths for select box (85%) and Go button (10%)
-- Added proper spacing between elements using Bootstrap margin utilities
-- Enhanced visual feedback during task execution with loading spinner
-- Implemented error handling and success messages in the UI
-- Ensured responsive design across different screen sizes 

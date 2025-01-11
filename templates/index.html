@@ -27,6 +27,21 @@
             font-family: inherit;
             font-size: 1rem;
         }
+        /* Custom height for task select */
+        #taskSelect {
+            height: 38px;  /* Standard height */
+            padding: 6px 12px;
+        }
+        /* Style for AI button */
+        #aiTaskButton {
+            background-color: #6f42c1;  /* Purple color */
+            border-color: #6f42c1;
+            color: white;
+        }
+        #aiTaskButton:hover {
+            background-color: #5a32a3;  /* Darker purple on hover */
+            border-color: #5a32a3;
+        }
     </style>
 </head>
 <body>
@@ -60,14 +75,26 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Select a Task</h5>
-                        <form id="taskForm" class="d-flex align-items-center justify-content-between">
-                            <select class="form-select me-2" id="taskSelect" required style="width: 85%;">
-                                <option value="">Choose a task...</option>
-                                {% for key, task in tasks.items() %}
-                                <option value="{{ key }}">Task {{ key }}: {{ task }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-primary" style="width: 10%;">Go</button>
+                        <form id="taskForm">
+                            <div class="mb-3">
+                                <div class="position-relative">
+                                    <select class="form-select" id="taskSelect" required>
+                                        <option value="">Choose a task...</option>
+                                        {% for key, task in tasks.items() %}
+                                        <option value="{{ key }}">Task {{ key }}: {{ task }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div id="aiThinking" class="position-absolute top-50 end-0 translate-middle-y me-3 d-none">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">AI thinking...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn" id="aiTaskButton" style="width: 10%;">AI</button>
+                                <button type="submit" class="btn btn-primary" style="width: 10%;">Go</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -91,6 +118,46 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Store the original task options
+            const originalTasks = $('#taskSelect').html();
+
+            function resetTaskSelect() {
+                $('#taskSelect').html(originalTasks);
+                $('#taskSelect').val('');  // Reset to "Choose a task..."
+            }
+
+            $('#aiTaskButton').on('click', function() {
+                const aiThinking = $('#aiThinking');
+                const taskSelect = $('#taskSelect');
+                
+                // Show thinking indicator in the select box
+                aiThinking.removeClass('d-none');
+                taskSelect.prop('disabled', true);
+                
+                // Request AI to create a new task
+                $.ajax({
+                    url: '/create_task',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            taskSelect.empty();  // Clear current options
+                            taskSelect.append(`<option value="ai_generated" selected>${response.task}</option>`);
+                        } else {
+                            alert('Failed to create AI task: ' + response.error);
+                            resetTaskSelect();  // Reset on error
+                        }
+                    },
+                    error: function() {
+                        alert('Error occurred while creating AI task');
+                        resetTaskSelect();  // Reset on error
+                    },
+                    complete: function() {
+                        aiThinking.addClass('d-none');
+                        taskSelect.prop('disabled', false);
+                    }
+                });
+            });
+
             $('#taskForm').on('submit', function(e) {
                 e.preventDefault();
                 const taskKey = $('#taskSelect').val();
@@ -111,20 +178,30 @@
                 resultSection.show();
                 resultContent.html('Processing task...');
 
+                // Get task text if it's an AI-generated task
+                const taskData = {
+                    task_key: taskKey,
+                    task_text: $('#taskSelect option:selected').text()
+                };
+
                 // Execute task
                 $.ajax({
                     url: '/execute_task',
                     method: 'POST',
-                    data: { task_key: taskKey },
+                    data: taskData,
                     success: function(response) {
                         if (response.success) {
                             resultContent.html(`<pre>${response.summary}</pre>`);
                         } else {
                             resultContent.html(`<div class="alert alert-danger">${response.error}</div>`);
                         }
+                        // Reset task selection after execution (success or failure)
+                        resetTaskSelect();
                     },
                     error: function() {
                         resultContent.html('<div class="alert alert-danger">An error occurred</div>');
+                        // Reset task selection after error
+                        resetTaskSelect();
                     },
                     complete: function() {
                         spinner.addClass('d-none');
