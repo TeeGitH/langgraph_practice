@@ -17,6 +17,8 @@ TASKS = {
     'E': "Create a crisis management and business continuity plan for multiple scenarios"
 }
 
+print("OpenAI API Key:", bool(os.getenv("OPENAI_API_KEY")))
+
 def print_task_menu():
     """Display the task selection menu"""
     print("\nAvailable Tasks:")

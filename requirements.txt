@@ -4,4 +4,7 @@ graphviz
 IPython
 langchain-openai
 python-dotenv
-flask 
+flask
+pytest
+black
+flake8 
